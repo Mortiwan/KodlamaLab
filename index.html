@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KodlamaLab | Python, C# & İngilizce Siber Akademi</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23070b14' stroke='%2300f0ff' stroke-width='4'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='800' font-size='30'%3E%3Ctspan fill='%2300f0ff'%3EK%3C/tspan%3E%3Ctspan fill='%2300e676'%3EL%3C/tspan%3E%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="cyber-bg" aria-hidden="true">
+    <div class="cyber-grid"></div>
+    <div class="cyber-code-pattern"></div>
+    <div class="cyber-glow glow-cyan"></div>
+    <div class="cyber-glow glow-emerald"></div>
+    <div class="cyber-glow glow-crimson"></div>
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <div id="app-shell" class="app-shell">
+    <div id="sidebar-backdrop" class="sidebar-backdrop hidden"></div>
+
+    <!-- SOL DİKEY MENÜ -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-wrap">
+          <div class="brand-icon"><i class="fa-solid fa-terminal"></i></div>
+          <div class="brand-text">
+            <span class="brand-title">KODLAMA<span>LAB</span></span>
+            <small class="brand-sub">CYBER DEV ENGINE</small>
+          </div>
+        </div>
+        <button id="close-sidebar-btn" class="icon-btn mobile-only" aria-label="Menüyü Kapat">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Ana Menü">
+        <span class="nav-label">KODLAMA MOTORU</span>
+        <button type="button" class="nav-item active" data-view="sandbox" data-lang="python">
+          <i class="fa-brands fa-python"></i><span>Python Lab</span>
+        </button>
+        <button type="button" class="nav-item" data-view="sandbox" data-lang="csharp">
+          <i class="fa-solid fa-code"></i><span>C# Lab</span>
+        </button>
+
+        <span class="nav-label">ÖĞRENME & SÖZLÜK</span>
+        <button type="button" class="nav-item" data-view="academy">
+          <i class="fa-solid fa-graduation-cap"></i><span>Kurslar (Akademi)</span>
+        </button>
+        <button type="button" class="nav-item" data-view="translate">
+          <i class="fa-solid fa-language"></i><span>Çeviri & Kod Sözlüğü</span>
+        </button>
+
+        <span class="nav-label">REKABET & PROFİL</span>
+        <button type="button" class="nav-item" data-view="leaderboard">
+          <i class="fa-solid fa-trophy"></i><span>Skor Tablosu</span>
+        </button>
+        <button type="button" class="nav-item" data-view="profile">
+          <i class="fa-solid fa-user-astronaut"></i><span>Profilim & İstatistik</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div id="sync-badge" class="sync-badge" title="Veri Senkronizasyon Durumu">
+          <span class="status-dot"></span>
+          <span id="sync-badge-text">Önbellek Hazır</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- SAĞ ANA ALAN -->
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" id="open-sidebar-btn" class="icon-btn mobile-only" aria-label="Menüyü Aç">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="topbar-progress-group" title="Kurslardaki Genel İlerleyişin">
+            <div class="mini-progress-item">
+              <span class="mini-progress-label"><i class="fa-brands fa-python"></i> PY <strong id="top-prog-py">0%</strong></span>
+              <div class="mini-bar"><div id="top-bar-py" class="mini-bar-fill py-fill" style="width: 0%"></div></div>
+            </div>
+            <div class="mini-progress-item">
+              <span class="mini-progress-label"><i class="fa-solid fa-code"></i> C# <strong id="top-prog-cs">0%</strong></span>
+              <div class="mini-bar"><div id="top-bar-cs" class="mini-bar-fill cs-fill" style="width: 0%"></div></div>
+            </div>
+            <div class="mini-progress-item">
+              <span class="mini-progress-label"><i class="fa-solid fa-earth-americas"></i> EN <strong id="top-prog-en">0%</strong></span>
+              <div class="mini-bar"><div id="top-bar-en" class="mini-bar-fill en-fill" style="width: 0%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button type="button" id="topbar-score-trigger" class="score-pill" title="Skor Tablosunu Aç">
+            <i class="fa-solid fa-bolt"></i>
+            <span id="topbar-total-xp">0</span>
+            <small>XP</small>
+            <span class="streak-divider"></span>
+            <i class="fa-solid fa-fire fire-icon"></i>
+            <span id="topbar-streak-count">0</span>
+          </button>
+
+          <div id="topbar-auth-buttons" class="topbar-auth-buttons">
+            <button type="button" id="btn-open-login" class="btn btn-outline-cyan btn-sm">
+              <i class="fa-solid fa-right-to-bracket"></i> Üye Girişi
+            </button>
+            <button type="button" id="btn-open-register" class="btn btn-primary btn-sm">
+              <i class="fa-solid fa-user-plus"></i> Kayıt Ol
+            </button>
+          </div>
+
+          <div id="topbar-user-menu-wrap" class="user-menu-wrap hidden">
+            <button type="button" id="topbar-avatar-trigger" class="avatar-menu-trigger" aria-expanded="false" title="Hesap Menüsü">
+              <div id="topbar-avatar" class="avatar-circle avatar-sm"></div>
+              <div class="topbar-user-meta">
+                <span id="topbar-name" class="topbar-name">Kullanıcı</span>
+                <small id="topbar-handle" class="topbar-handle">@kodcu</small>
+              </div>
+              <i class="fa-solid fa-chevron-down chevron-icon"></i>
+            </button>
+
+            <div id="avatar-dropdown" class="avatar-dropdown hidden">
+              <div class="dropdown-header">
+                <strong id="dropdown-fullname">Kullanıcı Adı</strong>
+                <span id="dropdown-username">@kullanici</span>
+              </div>
+              <button type="button" class="dropdown-item" data-dropdown-action="profile">
+                <i class="fa-solid fa-chart-pie"></i><span>Profilim & Puan Detayı</span>
+              </button>
+              <button type="button" class="dropdown-item" data-dropdown-action="avatar-wall">
+                <i class="fa-solid fa-masks-theater"></i><span>Avatar Duvarı</span>
+              </button>
+              <button type="button" class="dropdown-item" data-dropdown-action="change-password">
+                <i class="fa-solid fa-key"></i><span>Şifre Değiştir</span>
+              </button>
+              <div class="dropdown-divider"></div>
+              <button type="button" class="dropdown-item danger" data-dropdown-action="logout">
+                <i class="fa-solid fa-power-off"></i><span>Çıkış Yap</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <!-- BÖLÜM 1: SERBEST KODLAMA ALANI -->
+        <section id="view-sandbox" class="view-section active">
+          <div class="section-toolbar card">
+            <div class="toolbar-left">
+              <span id="sandbox-lang-badge" class="lang-badge python">
+                <i class="fa-brands fa-python"></i> Python 3 (Canlı Motor)
+              </span>
+              <input type="text" id="project-name-input" class="project-name-input" value="ilk_projem.py" aria-label="Proje Dosya Adı" />
+            </div>
+
+            <div class="toolbar-actions">
+              <select id="saved-projects-select" class="select-input" aria-label="Kayıtlı Projeler">
+                <option value="">Kayıtlı Projelerim...</option>
+              </select>
+              <button type="button" id="btn-new-project" class="btn btn-secondary btn-sm" title="Yeni Temiz Dosya">
+                <i class="fa-solid fa-file-circle-plus"></i> <span>Yeni</span>
+              </button>
+              <button type="button" id="btn-save-project" class="btn btn-secondary btn-sm" title="Önbelleğe ve Buluta Kaydet">
+                <i class="fa-solid fa-floppy-disk"></i> <span>Kaydet</span>
+              </button>
+              <button type="button" id="btn-ai-review" class="btn btn-cyber-blue btn-sm" title="Hataları Bul, Açıkla ve Puan Kazan">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Kontrol Et & Puanla</span>
+              </button>
+              <button type="button" id="btn-run-code" class="btn btn-emerald btn-sm">
+                <i class="fa-solid fa-play"></i> <span>Çalıştır</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="sandbox-grid">
+            <div class="editor-panel card">
+              <div class="panel-header">
+                <span><i class="fa-solid fa-file-code"></i> Kod Editörü</span>
+                <span id="engine-status" class="engine-status">Motor Hazır</span>
+              </div>
+              <div class="editor-wrapper">
+                <textarea id="code-editor"></textarea>
+              </div>
+              <div class="stdin-box">
+                <label for="code-stdin">
+                  <i class="fa-solid fa-keyboard"></i> Girdi (input / Console.ReadLine varsa her satıra bir değer yaz):
+                </label>
+                <textarea id="code-stdin" rows="2" placeholder="Örn:&#10;Harun&#10;28"></textarea>
+              </div>
+            </div>
+
+            <div class="output-column">
+              <div class="console-panel card">
+                <div class="panel-header">
+                  <span><i class="fa-solid fa-terminal"></i> Konsol Çıktısı</span>
+                  <button type="button" id="btn-clear-console" class="btn-text-sm">Temizle</button>
+                </div>
+                <pre id="console-output" class="console-output">Kodunu yazıp "Çalıştır" butonuna bas...</pre>
+              </div>
+
+              <div class="ai-panel card">
+                <div class="panel-header">
+                  <span><i class="fa-solid fa-robot"></i> AI Kod Hocası & Puan Analizi</span>
+                  <span id="ai-xp-earned-badge" class="xp-badge hidden">+0 XP</span>
+                </div>
+                <div id="ai-feedback-output" class="ai-feedback-output">
+                  <p class="muted-text">
+                    Kodunda hata varsa satır satır sebebini ve çözümünü öğrenmek, ayrıca öğrendiğin yeni kod yapılarından <strong>Skor Tablosu Puanı</strong> kazanmak için <strong>"Kontrol Et & Puanla"</strong> butonuna bas.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- BÖLÜM 2: DUOLINGO TARZI AKADEMİ -->
+        <section id="view-academy" class="view-section">
+          <div id="academy-hub">
+            <div class="academy-header card">
+              <div>
+                <h2><i class="fa-solid fa-graduation-cap"></i> Siber Dil Akademisi</h2>
+                <p>Sıfırdan zirveye adım adım dersler ve Gemini destekli sınırsız mini oyunlarla öğren.</p>
+              </div>
+              <div class="course-switcher">
+                <button type="button" class="course-pill active" data-course="python"><i class="fa-brands fa-python"></i> Python</button>
+                <button type="button" class="course-pill" data-course="csharp"><i class="fa-solid fa-code"></i> C#</button>
+                <button type="button" class="course-pill" data-course="english"><i class="fa-solid fa-earth-americas"></i> İngilizce</button>
+              </div>
+            </div>
+
+            <div class="course-banner card">
+              <div class="course-banner-info">
+                <h3 id="academy-course-title">Python Yolculuğu</h3>
+                <p id="academy-course-desc">Değişkenlerden döngülere, algoritmalardan gerçek projelere adım adım ilerle.</p>
+              </div>
+              <div class="course-banner-stats">
+                <div class="stat-chip"><i class="fa-solid fa-check-double"></i> <span id="academy-completed-count">0/10</span> Ders</div>
+                <div class="stat-chip"><i class="fa-solid fa-bolt"></i> <span id="academy-course-xp">0</span> XP</div>
+                <button type="button" id="btn-ai-random-game" class="btn btn-cyber-blue btn-sm" title="Gemini API ile bu kurs için sıfırdan yepyeni mini oyun oluştur">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> AI ile Oyun Oluştur
+                </button>
+              </div>
+            </div>
+
+            <div id="academy-path" class="academy-path"></div>
+          </div>
+
+          <div id="lesson-arena" class="lesson-arena card hidden">
+            <div class="lesson-top-bar">
+              <button type="button" id="btn-exit-lesson" class="icon-btn" title="Dersten Çık">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+              <div class="lesson-progress-track">
+                <div id="lesson-progress-fill" class="lesson-progress-fill" style="width: 0%"></div>
+              </div>
+              <div class="lesson-meta-pills">
+                <button type="button" id="btn-ai-regen-lesson" class="btn btn-cyber-blue btn-sm" title="Gemini API ile bu derse yepyeni sorular üret">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Yeni AI Soruları
+                </button>
+                <span class="heart-pill"><i class="fa-solid fa-heart"></i> <span id="lesson-hearts">3</span></span>
+                <span class="game-type-pill" id="lesson-game-type">Mini Oyun</span>
+              </div>
+            </div>
+
+            <div id="lesson-question-container" class="lesson-question-container"></div>
+
+            <div id="lesson-feedback-banner" class="lesson-feedback-banner hidden">
+              <div class="feedback-content">
+                <strong id="feedback-title">Harika!</strong>
+                <p id="feedback-detail"></p>
+              </div>
+              <button type="button" id="btn-next-question" class="btn btn-primary">Devam Et <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+
+            <div id="lesson-action-bar" class="lesson-action-bar">
+              <button type="button" id="btn-check-answer" class="btn btn-emerald btn-lg">Kontrol Et</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- BÖLÜM 3: ÇEVİRİ & DEV KOD SÖZLÜĞÜ -->
+        <section id="view-translate" class="view-section">
+          <div class="section-heading">
+            <h2><i class="fa-solid fa-language"></i> Sınırsız Çeviri & Kod Sözlüğü</h2>
+            <p>Devasa AI dil ve yazılım kütüphanesiyle İngilizce/Türkçe metinleri gramerleriyle çevir; Python ve C# kodlarının tam karşılığını, çalışma mantığını ve uyumluluk kurallarını öğren.</p>
+          </div>
+
+          <div class="translate-card card">
+            <div class="translate-bar">
+              <select id="tr-source-lang" class="select-input">
+                <option value="en">İngilizce</option>
+                <option value="tr">Türkçe</option>
+                <option value="python">Python Kodu</option>
+                <option value="csharp">C# Kodu</option>
+              </select>
+
+              <button type="button" id="btn-swap-lang" class="icon-btn swap-btn" title="Dilleri Değiştir">
+                <i class="fa-solid fa-right-left"></i>
+              </button>
+
+              <select id="tr-target-lang" class="select-input">
+                <option value="tr">Türkçe</option>
+                <option value="en">İngilizce</option>
+                <option value="code_analysis">TR & EN Kod Analizi</option>
+              </select>
+            </div>
+
+            <div class="translate-boxes">
+              <div class="translate-box source-box">
+                <textarea id="tr-input" rows="6" placeholder="İngilizce/Türkçe cümle veya Python / C# kodu yaz..."></textarea>
+                <div class="translate-box-footer">
+                  <button type="button" id="btn-tr-clear" class="btn-text-sm"><i class="fa-solid fa-eraser"></i> Temizle</button>
+                  <button type="button" id="btn-translate-go" class="btn btn-primary">
+                    <i class="fa-solid fa-bolt"></i> Çevir & Analiz Et
+                  </button>
+                </div>
+              </div>
+
+              <div class="translate-box target-box">
+                <div id="tr-output" class="tr-output-text">Çeviri veya kod karşılığı burada görünecek...</div>
+                <div class="translate-box-footer">
+                  <span id="tr-loading-indicator" class="muted-text hidden"><i class="fa-solid fa-spinner fa-spin"></i> Dev kütüphane taranıyor...</span>
+                  <button type="button" id="btn-tr-copy" class="btn-text-sm"><i class="fa-regular fa-copy"></i> Kopyala</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="tr-deep-analysis" class="deep-analysis-grid hidden"></div>
+          </div>
+
+          <div class="dictionary-card card">
+            <div class="dictionary-header">
+              <h3><i class="fa-solid fa-magnifying-glass"></i> Dev Kelime & Kod Arama Motoru</h3>
+              <p>Herhangi bir İngilizce/Türkçe kelime ya da Python/C# komutu (örn: <code>yield</code>, <code>foreach</code>, <code>LINQ</code>, <code>although</code>, <code>get</code>) yaz; tüm fiil, zarf, gramer veya kod uyumluluk kuralları aşağı doğru sıralansın.</p>
+            </div>
+
+            <div class="dictionary-search-bar">
+              <select id="dict-type-select" class="select-input">
+                <option value="auto">Otomatik Algıla</option>
+                <option value="word">İngilizce / Türkçe Kelime</option>
+                <option value="python">Python Kodu / Komutu</option>
+                <option value="csharp">C# Kodu / Komutu</option>
+              </select>
+              <input type="text" id="dict-search-input" class="search-input" placeholder="Kelime veya kod yazıp Ara'ya bas..." />
+              <button type="button" id="btn-dict-search" class="btn btn-emerald">
+                <i class="fa-solid fa-search"></i> Detaylı Ara
+              </button>
+            </div>
+
+            <div id="dict-recent-searches" class="recent-chips"></div>
+
+            <div id="dict-results" class="dict-results">
+              <p class="muted-text">Bir kelime veya kod arattığında tüm gramer bilgileri, alternatif anlamları veya kodun neyle çalışıp neyle çalışmadığı burada alt alta listelenir.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- BÖLÜM 4: CANLI SKOR TABLOSU -->
+        <section id="view-leaderboard" class="view-section">
+          <div class="section-heading-row">
+            <div>
+              <h2><i class="fa-solid fa-trophy"></i> Canlı Skor Tablosu</h2>
+              <p>Arkadaşınla puanlarınızı, günlük serilerinizi ve ders ilerleyişinizi anlık takip et. Detaylar için herhangi bir profile tıkla.</p>
+            </div>
+            <div class="filter-pills">
+              <button type="button" class="filter-pill active" data-lb-sort="totalXp">Toplam Puan</button>
+              <button type="button" class="filter-pill" data-lb-sort="sandboxXp">Serbest Kodlama</button>
+              <button type="button" class="filter-pill" data-lb-sort="academyXp">Kurs Puanı</button>
+              <button type="button" class="filter-pill" data-lb-sort="streak">Günlük Seri</button>
+            </div>
+          </div>
+
+          <div class="leaderboard-card card">
+            <div id="leaderboard-list" class="leaderboard-list"></div>
+          </div>
+        </section>
+
+        <!-- BÖLÜM 5: PROFİLİM & DETAYLI İSTATİSTİKLER -->
+        <section id="view-profile" class="view-section">
+          <div class="profile-grid">
+            <div class="profile-left">
+              <div class="profile-hero card">
+                <div id="profile-avatar-large" class="avatar-circle avatar-xl"></div>
+                <h2 id="profile-fullname">Misafir Kullanıcı</h2>
+                <span id="profile-username-tag" class="username-tag">@misafir</span>
+                <div class="profile-quick-stats">
+                  <div><strong id="stat-total-xp">0</strong><span>Toplam XP</span></div>
+                  <div><strong id="stat-streak">0</strong><span>Gün Seri</span></div>
+                  <div><strong id="stat-projects">0</strong><span>Proje</span></div>
+                </div>
+                <div class="profile-hero-actions">
+                  <button type="button" id="btn-open-avatar-wall-from-profile" class="btn btn-primary btn-block">
+                    <i class="fa-solid fa-masks-theater"></i> Avatar Duvarını Aç
+                  </button>
+                  <button type="button" id="btn-open-password-from-profile" class="btn btn-secondary btn-block">
+                    <i class="fa-solid fa-key"></i> Şifre Değiştir
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-right">
+              <div class="card">
+                <h3><i class="fa-solid fa-chart-line"></i> Kurs İlerleyiş Detayı</h3>
+                <div id="profile-course-details" class="course-detail-list"></div>
+              </div>
+
+              <div class="card">
+                <h3><i class="fa-solid fa-gamepad"></i> Oyun & Etkinlik Performansı</h3>
+                <p class="muted-text">Hangi oyundan kaç puan aldığın, kaç kez kazandığın, kaybettiğin veya henüz girmediğin tüm alanlar:</p>
+                <div class="table-responsive">
+                  <table class="stats-table">
+                    <thead>
+                      <tr>
+                        <th>Oyun / Alan</th>
+                        <th>Durum</th>
+                        <th>Kazanılan</th>
+                        <th>Kaybedilen</th>
+                        <th>Toplam Puan</th>
+                      </tr>
+                    </thead>
+                    <tbody id="profile-games-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL 1: ÜYE GİRİŞİ / KAYIT OL -->
+  <div id="auth-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <div class="brand-wrap">
+          <div class="brand-icon sm"><i class="fa-solid fa-terminal"></i></div>
+          <h3>KodlamaLab Hesabı</h3>
+        </div>
+        <button type="button" id="btn-close-auth-modal" class="icon-btn" aria-label="Kapat"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab active" data-auth-tab="login">Üye Girişi</button>
+          <button type="button" class="auth-tab" data-auth-tab="register">Kayıt Ol</button>
+        </div>
+
+        <form id="login-form" class="auth-form active">
+          <div class="input-group">
+            <label for="login-username">Kullanıcı Adı</label>
+            <input type="text" id="login-username" placeholder="ornek_kullanici" required autocomplete="username" />
+          </div>
+          <div class="input-group">
+            <label for="login-password">Şifre</label>
+            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <i class="fa-solid fa-right-to-bracket"></i> Giriş Yap
+          </button>
+        </form>
+
+        <form id="register-form" class="auth-form">
+          <div class="input-row">
+            <div class="input-group">
+              <label for="reg-firstname">Ad</label>
+              <input type="text" id="reg-firstname" placeholder="Adın" required />
+            </div>
+            <div class="input-group">
+              <label for="reg-lastname">Soyad</label>
+              <input type="text" id="reg-lastname" placeholder="Soyadın" required />
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="reg-username">Kullanıcı Adı</label>
+            <input type="text" id="reg-username" placeholder="benzersiz_ad" required autocomplete="username" />
+          </div>
+          <div class="input-group">
+            <label for="reg-password">Şifre</label>
+            <input type="password" id="reg-password" placeholder="En az 4 karakter" minlength="4" required autocomplete="new-password" />
+          </div>
+          <button type="submit" class="btn btn-emerald btn-block">
+            <i class="fa-solid fa-user-plus"></i> Hesap Oluştur ve Başla
+          </button>
+        </form>
+
+        <p id="auth-status-msg" class="auth-status-msg"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: AVATAR DUVARI -->
+  <div id="avatar-wall-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-masks-theater"></i> Avatar Duvarı & Stüdyosu</h3>
+        <button type="button" id="btn-close-avatar-modal" class="icon-btn" aria-label="Kapat"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body avatar-wall-layout">
+        <div class="avatar-editor-pane">
+          <div class="avatar-preview-stage">
+            <div id="avatar-wall-preview" class="avatar-circle avatar-xl"></div>
+            <span class="preview-tag">Canlı Önizleme</span>
+          </div>
+
+          <div class="avatar-controls">
+            <div class="control-row">
+              <label for="av-bg">Arka Plan</label>
+              <input type="color" id="av-bg" value="#0099ff" />
+            </div>
+            <div class="control-row">
+              <label for="av-skin">Ten Rengi</label>
+              <select id="av-skin" class="select-input">
+                <option value="#f8d9c6">Açık</option>
+                <option value="#e8b896">Buğday</option>
+                <option value="#c68642">Esmer</option>
+                <option value="#8d5524">Koyu</option>
+              </select>
+            </div>
+            <div class="control-row">
+              <label for="av-hair-style">Saç Stili</label>
+              <select id="av-hair-style" class="select-input">
+                <option value="short">Kısa</option>
+                <option value="spiky">Siber Dikenli</option>
+                <option value="long">Uzun</option>
+                <option value="curly">Kıvırcık</option>
+                <option value="none">Yok</option>
+              </select>
+            </div>
+            <div class="control-row">
+              <label for="av-hair-color">Saç Rengi</label>
+              <input type="color" id="av-hair-color" value="#0f172a" />
+            </div>
+            <div class="control-row">
+              <label for="av-accessory">Aksesuar</label>
+              <select id="av-accessory" class="select-input">
+                <option value="none">Yok</option>
+                <option value="glasses">Gözlük</option>
+                <option value="sunglasses">Siber Vizör</option>
+                <option value="headphones">Kulaklık</option>
+                <option value="cap">Şapka</option>
+              </select>
+            </div>
+            <div class="control-row">
+              <label for="av-shirt">Kıyafet Rengi</label>
+              <input type="color" id="av-shirt" value="#00e676" />
+            </div>
+          </div>
+
+          <button type="button" id="btn-save-avatar" class="btn btn-emerald btn-block">
+            <i class="fa-solid fa-check"></i> Avatarı Kaydet ve Uygula
+          </button>
+        </div>
+
+        <div class="avatar-gallery-pane">
+          <h4><i class="fa-solid fa-wand-sparkles"></i> Tek Tıkla Siber Hazır Avatarlar</h4>
+          <div id="preset-avatars-grid" class="preset-avatars-grid"></div>
+
+          <h4 class="mt-20"><i class="fa-solid fa-users"></i> Topluluk Avatar Duvarı</h4>
+          <p class="muted-text">Kayıtlı arkadaşlarının avatarlarını gör, profiline bakmak için tıkla.</p>
+          <div id="community-avatar-wall" class="community-avatar-wall"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: ŞİFRE DEĞİŞTİR -->
+  <div id="password-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-key"></i> Şifre Değiştir</h3>
+        <button type="button" id="btn-close-password-modal" class="icon-btn" aria-label="Kapat"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="change-password-form" class="auth-form active">
+          <div class="input-group">
+            <label for="old-password">Mevcut Şifre</label>
+            <input type="password" id="old-password" placeholder="Şu anki şifren" required />
+          </div>
+          <div class="input-group">
+            <label for="new-password">Yeni Şifre</label>
+            <input type="password" id="new-password" placeholder="En az 4 karakter" minlength="4" required />
+          </div>
+          <div class="input-group">
+            <label for="confirm-new-password">Yeni Şifre (Tekrar)</label>
+            <input type="password" id="confirm-new-password" placeholder="Yeni şifreni doğrula" minlength="4" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <i class="fa-solid fa-shield-halved"></i> Şifreyi Güncelle
+          </button>
+        </form>
+        <p id="password-status-msg" class="auth-status-msg"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: ARKADAŞ PROFİLİ İNCELEME -->
+  <div id="user-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-id-card"></i> Kullanıcı Profili ve İstatistikleri</h3>
+        <button type="button" id="btn-close-user-modal" class="icon-btn" aria-label="Kapat"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="user-modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
