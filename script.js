@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KODLAMALAB - HATA KORUMALI ANA UYGULAMA MOTORU (script.js)
+   KODLAMALAB - HATA & ZAMAN AŞIMI KORUMALI ANA MOTOR (script.js)
    ========================================================================== */
 
 const CONFIG = {
@@ -415,7 +415,7 @@ function normalizeUser(user) {
   return user;
 }
 
-/* ---------- VERİTABANI (ÖNBELLEK + FIREBASE) ---------- */
+/* ---------- VERİTABANI (ÖNBELLEK + ARKA PLAN FIREBASE) ---------- */
 function loadLocalUsers() {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.USERS);
@@ -482,8 +482,8 @@ async function persistUser(user) {
   saveLocalUsers();
 
   if (STATE.cloudReady && STATE.db) {
-    try { await STATE.db.collection("users").doc(user.username).set(user, { merge: true }); }
-    catch (err) { console.warn("Buluta senkronize edilemedi:", err); }
+    STATE.db.collection("users").doc(user.username).set(user, { merge: true })
+      .catch(err => console.warn("Buluta senkronize edilemedi:", err));
   }
 }
 
@@ -728,20 +728,35 @@ async function handleChangePassword(e) {
   showToast("Şifren başarıyla güncellendi!", "success");
 }
 
-/* ---------- GOOGLE APPS SCRIPT KÖPRÜSÜ ---------- */
+/* ---------- GOOGLE APPS SCRIPT KÖPRÜSÜ (ZAMAN AŞIMI KORUMALI) ---------- */
 async function callBridge(payload) {
   if (!CONFIG.APPS_SCRIPT_URL) throw new Error("Google Apps Script köprüsü bağlı değil.");
-  const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(payload)
-  });
-  const text = await response.text();
-  let data;
-  try { data = JSON.parse(text); }
-  catch { throw new Error("Sunucudan geçersiz yanıt döndü."); }
-  if (!data.ok) throw new Error(data.error || "İşlem sırasında bir hata oluştu.");
-  return data;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+  try {
+    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+      method: "POST",
+      redirect: "follow",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+    const text = await response.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch { throw new Error("Apps Script geçersiz yanıt döndürdü (Dağıtım erişimi 'Herkes' olmayabilir)."); }
+    if (!data.ok) throw new Error(data.error || "Köprü tarafında bir hata oluştu.");
+    return data;
+  } catch (err) {
+    if (err.name === "AbortError") {
+      throw new Error("Bağlantı 25 saniyede yanıt vermedi (Apps Script veya Gemini API takıldı).");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 /* ---------- SERBEST KODLAMA ALANI (CODEMIRROR + YEDEK TEXTAREA) ---------- */
